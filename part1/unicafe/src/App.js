@@ -12,6 +12,24 @@ const SectionHeader = ({text}) => (
   <h2>{text}</h2>
 )
 
+const Statistics = (values) => {
+
+  const totalClicks = () => values.good + values.neutral + values.bad
+  const getAvg = () => (values.good - values.bad) / totalClicks()
+
+  
+  return (
+    <div>
+    <StatsDisplay text="Average: " value={getAvg()}/>
+    <StatsDisplay text="Positive: " value={values.good / totalClicks()}/>
+    <StatsDisplay text="good " value={values.good}/>
+    <StatsDisplay text="neutral " value={values.neutral}/>
+    <StatsDisplay text="bad " value={values.bad}/>
+    </div>
+  )
+
+}
+
 function App() {
 
   const [good, setGood] = useState(0)
@@ -29,10 +47,8 @@ function App() {
       <Button handleClick={() => incrementState(neutral, setNeutral)} text="neutral"/>
       <Button handleClick={() => incrementState(bad, setBad)} text="bad"/>
 
-      <SectionHeader text="Results"/>
-      <StatsDisplay text="good " value={good}/>
-      <StatsDisplay text="neutral " value={neutral}/>
-      <StatsDisplay text="bad " value={bad}/>
+      <SectionHeader text="Stats"/>
+      <Statistics good={good} neutral={neutral} bad={bad}/>
     </div>
   );
 }
