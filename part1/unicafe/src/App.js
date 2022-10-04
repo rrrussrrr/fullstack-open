@@ -5,7 +5,11 @@ const Button = (props) => (
 )
 
 const StatsDisplay = (props) => (
-  <p>{props.text} {props.value}</p>
+  <tr>
+    <td>{props.text}</td>
+    <td>{props.value}</td>
+  </tr>
+
 )
 
 const SectionHeader = ({text}) => (
@@ -19,13 +23,13 @@ const Statistics = (values) => {
 
   
   return (
-    <div>
+    <table>
     <StatsDisplay text="Average: " value={getAvg()}/>
     <StatsDisplay text="Positive: " value={values.good / totalClicks()}/>
     <StatsDisplay text="good " value={values.good}/>
     <StatsDisplay text="neutral " value={values.neutral}/>
     <StatsDisplay text="bad " value={values.bad}/>
-    </div>
+    </table>
   )
 
 }
