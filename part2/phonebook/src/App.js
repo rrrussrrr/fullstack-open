@@ -24,6 +24,7 @@ const App = () => {
   ]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
+  const [filterValue, setFilterValue] = useState('')
 
   const addPerson = (e) => {
     e.preventDefault()
@@ -53,9 +54,21 @@ const App = () => {
   const numberInputChange = (e) => {
     setNewNumber(e.target.value)
   }
+
+  const filterValueChange = (e) => {
+    setFilterValue(e.target.value)
+  }
+
+  const filteredPersons = persons.filter(person => 
+    person.name.includes(filterValue)
+  )
   return (
+    
     <div>
       <h2>Phonebook</h2>
+
+      <h3>Add new contact</h3>
+      {/* input forms */}
       <form onSubmit={addPerson}>
         <div>
           name: <input 
@@ -76,7 +89,15 @@ const App = () => {
         </div>
       </form>
       <h2>Numbers</h2>
-      <PersonsDisplay persons={persons}/>
+
+      <div>
+        Filter contacts by name: <input 
+          value={filterValue}
+          onChange={filterValueChange}
+        />
+      </div>
+
+      <PersonsDisplay persons={filteredPersons}/>
     </div>
   )
 }
