@@ -1,36 +1,24 @@
 import { useState } from 'react'
+import Filter from './components/Filter'
+import ContactsDisplay from './components/ContactsDisplay'
 
-const PersonsDisplay = ({persons}) => {
-  return (
-    <ul>
-    {persons.map(person => 
-      <Person key={person.name} name={person.name} number={person.number}/>
-    )}
-    </ul>
-  )
-}
-
-const Person = (props) => {
-  return (
-  <li>
-    {props.name} {props.number}
-  </li>
-  )
-}
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas' }
-  ]) 
+  const [contacts, setContacts] = useState([
+    { name: 'Arto Hellas', number: '040-123456', id: 1 },
+    { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
+    { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
+    { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
+  ])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filterValue, setFilterValue] = useState('')
 
-  const addPerson = (e) => {
+  const addContact = (e) => {
     e.preventDefault()
     console.log('button clicked', e.target)
     
-    if (persons.filter(person => person.name === newName).length > 0) {
+    if (contacts.filter(contact => contact.name === newName).length > 0) {
       alert(`${newName} is already added to phonebook`)
     } 
     else {
@@ -41,7 +29,7 @@ const App = () => {
         // date: new Date().toISOString()
       }
   
-      setPersons(persons.concat(nameObject));
+      setContacts(contacts.concat(nameObject));
       setNewName('')
       setNewNumber('')
     }
@@ -59,8 +47,8 @@ const App = () => {
     setFilterValue(e.target.value)
   }
 
-  const filteredPersons = persons.filter(person => 
-    person.name.includes(filterValue)
+  const filteredContacts = contacts.filter(contact => 
+    contact.name.includes(filterValue)
   )
   return (
     
@@ -69,7 +57,7 @@ const App = () => {
 
       <h3>Add new contact</h3>
       {/* input forms */}
-      <form onSubmit={addPerson}>
+      <form onSubmit={addContact}>
         <div>
           name: <input 
           value={newName}
@@ -90,14 +78,9 @@ const App = () => {
       </form>
       <h2>Numbers</h2>
 
-      <div>
-        Filter contacts by name: <input 
-          value={filterValue}
-          onChange={filterValueChange}
-        />
-      </div>
+      <Filter value={filterValue} onChange={filterValueChange}/>
 
-      <PersonsDisplay persons={filteredPersons}/>
+      <ContactsDisplay contacts={filteredContacts}/>
     </div>
   )
 }
