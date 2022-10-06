@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import Filter from './components/Filter'
 import ContactsDisplay from './components/ContactsDisplay'
+import NewContactForm from './components/NewContactForm'
+
+
 
 
 const App = () => {
@@ -55,29 +58,16 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
 
-      <h3>Add new contact</h3>
-      {/* input forms */}
-      <form onSubmit={addContact}>
-        <div>
-          name: <input 
-          value={newName}
-          onChange={nameInputChange}
-          />
-        </div>
-        <div>
-          number: <input 
-          value={newNumber}
-          onChange={numberInputChange}
-          />
-        </div>
-        <div>
-          <button type="submit">
-              add
-          </button>
-        </div>
-      </form>
-      <h2>Numbers</h2>
 
+      {/* input forms */}
+      <NewContactForm 
+        onSubmit={addContact} 
+        newNname={newName} 
+        nameInputChange={nameInputChange}
+        newNumber={newNumber}
+        numberInputChange={numberInputChange}
+      />
+      <h2>Numbers</h2>
       <Filter value={filterValue} onChange={filterValueChange}/>
 
       <ContactsDisplay contacts={filteredContacts}/>
