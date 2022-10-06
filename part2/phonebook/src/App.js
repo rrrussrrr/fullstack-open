@@ -4,7 +4,7 @@ const PersonsDisplay = ({persons}) => {
   return (
     <ul>
     {persons.map(person => 
-      <Person key={person.name} name={person.name}/>
+      <Person key={person.name} name={person.name} number={person.number}/>
     )}
     </ul>
   )
@@ -13,7 +13,7 @@ const PersonsDisplay = ({persons}) => {
 const Person = (props) => {
   return (
   <li>
-    {props.name}
+    {props.name} {props.number}
   </li>
   )
 }
@@ -23,37 +23,50 @@ const App = () => {
     { name: 'Arto Hellas' }
   ]) 
   const [newName, setNewName] = useState('')
+  const [newNumber, setNewNumber] = useState('')
 
-  const addName = (e) => {
+  const addPerson = (e) => {
     e.preventDefault()
     console.log('button clicked', e.target)
     
     if (persons.filter(person => person.name === newName).length > 0) {
-      alert("Name already exists")
+      alert(`${newName} is already added to phonebook`)
     } 
     else {
 
       const nameObject = {
         name: newName,
+        number: newNumber
         // date: new Date().toISOString()
       }
   
       setPersons(persons.concat(nameObject));
       setNewName('')
+      setNewNumber('')
     }
   }
 
   const nameInputChange = (e) => {
     setNewName(e.target.value)
   }
+
+  const numberInputChange = (e) => {
+    setNewNumber(e.target.value)
+  }
   return (
     <div>
       <h2>Phonebook</h2>
-      <form onSubmit={addName}>
+      <form onSubmit={addPerson}>
         <div>
           name: <input 
           value={newName}
           onChange={nameInputChange}
+          />
+        </div>
+        <div>
+          number: <input 
+          value={newNumber}
+          onChange={numberInputChange}
           />
         </div>
         <div>
