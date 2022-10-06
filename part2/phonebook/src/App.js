@@ -28,13 +28,19 @@ const App = () => {
     e.preventDefault()
     console.log('button clicked', e.target)
     
-    const nameObject = {
-      name: newName,
-      date: new Date().toISOString()
-    }
+    if (persons.filter(person => person.name === newName).length > 0) {
+      alert("Name already exists")
+    } 
+    else {
 
-    setPersons(persons.concat(nameObject));
-    setNewName('')
+      const nameObject = {
+        name: newName,
+        // date: new Date().toISOString()
+      }
+  
+      setPersons(persons.concat(nameObject));
+      setNewName('')
+    }
   }
 
   const nameInputChange = (e) => {
