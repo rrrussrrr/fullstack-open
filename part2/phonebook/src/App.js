@@ -11,7 +11,6 @@ const PersonsDisplay = ({persons}) => {
 }
 
 const Person = (props) => {
-  console.log("person ", props)
   return (
   <li>
     {props.name}
@@ -26,22 +25,35 @@ const App = () => {
   const [newName, setNewName] = useState('')
 
   const addName = (e) => {
+    e.preventDefault()
+    console.log('button clicked', e.target)
+    
+    const nameObject = {
+      name: newName,
+      date: new Date().toISOString()
+    }
 
+    setPersons(persons.concat(nameObject));
+    setNewName('')
+  }
+
+  const nameInputChange = (e) => {
+    setNewName(e.target.value)
   }
   return (
     <div>
       <h2>Phonebook</h2>
-      <form>
+      <form onSubmit={addName}>
         <div>
-          name: <input />
+          name: <input 
+          value={newName}
+          onChange={nameInputChange}
+          />
         </div>
         <div>
-          <button 
-            type="submit"
-            onClick={addName}
-            >
+          <button type="submit">
               add
-            </button>
+          </button>
         </div>
       </form>
       <h2>Numbers</h2>
