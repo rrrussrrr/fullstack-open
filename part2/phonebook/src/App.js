@@ -34,13 +34,19 @@ const App = () => {
     } 
     else {
 
-      const nameObject = {
+      const contactObject = {
         name: newName,
         number: newNumber
         // date: new Date().toISOString()
       }
   
-      setContacts(contacts.concat(nameObject));
+      // setContacts(contacts.concat(contactObject));
+      axios
+      .post('http://localhost:3001/contacts', contactObject)
+      .then(response => {
+        console.log(response)
+      })
+     
       setNewName('')
       setNewNumber('')
     }
