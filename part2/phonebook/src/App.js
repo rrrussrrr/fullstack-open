@@ -4,6 +4,7 @@ import Filter from './components/Filter'
 import ContactsDisplay from './components/ContactsDisplay'
 import NewContactForm from './components/NewContactForm'
 import contactService from './services/contacts'
+import './index.css'
 
 
 
@@ -13,6 +14,23 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filterValue, setFilterValue] = useState('')
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [updateMessage, setUpdateMessage] = useState(null);
+
+  const Notification = ({message}) => {
+    if (message === null) return null
+
+    return (
+      <div className="notification">{message}</div>
+    )
+  }
+  const ErrorMessage = ({message}) => {
+    if (message === null) return null
+
+    return (
+      <div className="error">{message}</div>
+    )
+  }
 
   useEffect(() => {
     contactService
@@ -34,6 +52,15 @@ const App = () => {
       setContacts(contacts.map(contact => contact.id !== id ? contact : returnedContact));
       setNewName('')
       setNewNumber('')
+    })
+    .catch(error => {
+      setErrorMessage(
+        `Information for '${nameObject.name}' was already removed from server`
+      )
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+      setContacts(contacts.filter(contact => contact.id !== id))
     })
   }
   
@@ -61,6 +88,12 @@ const App = () => {
         setContacts(contacts.concat(returnedContact));
         setNewName('')
         setNewNumber('')
+        setUpdateMessage(
+          `Added ${returnedContact.name}`
+        )
+        setTimeout(() => {
+          setUpdateMessage(null)
+        }, 5000)
       })
     }
   }
@@ -94,8 +127,8 @@ const App = () => {
     
     <div>
       <h2>Phonebook</h2>
-
-
+      <Notification message={updateMessage}/>
+      <ErrorMessage message={errorMessage}/>
       {/* input forms */}
       <NewContactForm 
         onSubmit={addContact} 
