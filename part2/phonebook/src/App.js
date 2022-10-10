@@ -22,26 +22,58 @@ const App = () => {
       })
   }, [])
 
+  const modifyContactNumber = (id) => {
+    const nameObject = {
+      name: newName,
+      number: newNumber
+    }
+
+    contactService
+    .update(id, nameObject)
+    .then(returnedContact => {
+      setContacts(contacts.map(contact => contact.id !== id ? contact : returnedContact));
+      setNewName('')
+      setNewNumber('')
+    })
+  }
+  
+
   const addContact = (e) => {
     e.preventDefault()
-    
-    if (contacts.filter(contact => contact.name === newName).length > 0) {
-      alert(`${newName} is already added to phonebook`)
+    const sameName = contacts.filter(contact => contact.name === newName)
+    if (sameName.length > 0) {
+      const oldContact = sameName[0];
+      if (window.confirm(`${oldContact.name} is already added to phonebook, replace the old number with a new one?`)) {
+        modifyContactNumber(oldContact.id)
+      }
     } 
     else {
       const nameObject = {
         name: newName,
         number: newNumber
       }
+
+      console.log(nameObject)
       contactService
-      .create('http://localhost:3001/contacts', nameObject)
+      .create(nameObject)
       .then(returnedContact => {
+        console.log(returnedContact)
         setContacts(contacts.concat(returnedContact));
         setNewName('')
         setNewNumber('')
       })
     }
   }
+
+  const deleteContactByID = id => {
+    const contact = contacts.find(n => n.id === id)
+
+    contactService
+    .deleteItem(id)
+    .then(returned => {
+      setContacts(contacts.filter(n => n.id !==id))
+    })
+}
 
   const nameInputChange = (e) => {
     setNewName(e.target.value)
@@ -67,7 +99,7 @@ const App = () => {
       {/* input forms */}
       <NewContactForm 
         onSubmit={addContact} 
-        newNname={newName} 
+        newName={newName} 
         nameInputChange={nameInputChange}
         newNumber={newNumber}
         numberInputChange={numberInputChange}
@@ -75,7 +107,7 @@ const App = () => {
       <h2>Numbers</h2>
       <Filter value={filterValue} onChange={filterValueChange}/>
 
-      <ContactsDisplay contacts={filteredContacts}/>
+      <ContactsDisplay contacts={filteredContacts} deleteContactByID={deleteContactByID}/>
     </div>
   )
 }
