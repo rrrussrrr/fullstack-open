@@ -3,6 +3,7 @@ import axios from 'axios'
 import Filter from './components/Filter'
 import ContactsDisplay from './components/ContactsDisplay'
 import NewContactForm from './components/NewContactForm'
+import contactService from './services/contacts'
 
 
 
@@ -13,42 +14,32 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [filterValue, setFilterValue] = useState('')
 
-  const hook = () => {
-    console.log('effect')
-    axios
-      .get('http://localhost:3001/contacts')
-      .then(response => {
-        console.log('promise fulfilled')
-        setContacts(response.data)
+  useEffect(() => {
+    contactService
+      .getAll()
+      .then(initialContacts => {
+        setContacts(initialContacts)
       })
-  }
-  
-  useEffect(hook, [])
+  }, [])
 
   const addContact = (e) => {
     e.preventDefault()
-    console.log('button clicked', e.target)
     
     if (contacts.filter(contact => contact.name === newName).length > 0) {
       alert(`${newName} is already added to phonebook`)
     } 
     else {
-
-      const contactObject = {
+      const nameObject = {
         name: newName,
         number: newNumber
-        // date: new Date().toISOString()
       }
-  
-      // setContacts(contacts.concat(contactObject));
-      axios
-      .post('http://localhost:3001/contacts', contactObject)
-      .then(response => {
-        console.log(response)
+      contactService
+      .create('http://localhost:3001/contacts', nameObject)
+      .then(returnedContact => {
+        setContacts(contacts.concat(returnedContact));
+        setNewName('')
+        setNewNumber('')
       })
-     
-      setNewName('')
-      setNewNumber('')
     }
   }
 
