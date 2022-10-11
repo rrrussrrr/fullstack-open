@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 app.use(express.json())
 
-const contacts = [
+let contacts = [
     { 
       "id": 1,
       "name": "Arto Hellas", 
@@ -54,33 +54,43 @@ app.get('/', (request, response) => {
     }
   })
 
-  app.delete('/api/contact/:id', (request, response) => {
+  app.delete('/api/contacts/:id', (request, response) => {
     const id = Number(request.params.id)
-    contact = contact.filter(contact => contact.id !== id)
+    contacts = contacts.filter(contact => contact.id !== id)
   
     response.status(204).end()
   })
 
   const generateId = () => {
-    const maxId = contacts.length > 0
-      ? Math.max(...contacts.map(n => n.id))
-      : 0
-    return maxId + 1
+    const id = Math.floor(Math.random()*999999999)
+    return id
   }
 
   app.post('/api/contacts', (request, response) => {
     const body = request.body
-    if (!body.content) {
+    if (!body.name) {
         return response.status(400).json({ 
-          error: 'content missing' 
+          error: 'name missing' 
+        })
+      }
+
+      if (!body.number) {
+        return response.status(400).json({ 
+          error: 'number missing' 
+        })
+      }
+
+      if (contacts.find(contact => contact.name === body.name)) {
+        return response.status(400).json({ 
+          error: 'name must be unique' 
         })
       }
 
       const contact = {
-        content: body.content,
-        important: body.important || false,
-        date: new Date(),
         id: generateId(),
+        name: body.name,
+        number: body.number,
+        date: new Date(),
       } 
 
     contacts = contacts.concat(contact)
