@@ -81,15 +81,18 @@ app.get('/', (request, response) => {
       response.statusMessage = "404 Not Found"
       return response.status(404).end()     
     }
-    Contact.findById(id).then(contact => {
-      console.log(contact)
+    Contact.findById(id)
+      .then(contact => {
         if(!contact) {
-            response.statusMessage = "404 Not Found"
-            return response.status(404).end()
+          return response.status(404).end()
         } else {
             response.json(contact)
         }
-    })
+      })
+      .catch(error => {
+        console.log(error)
+        response.status(500).end()
+      })
   })
 
 
