@@ -1,0 +1,6 @@
+all	git@github.com:rrrussrrr/fullstack-online.git (fetch)
+all	git@github.com:rrrussrrr/fullstack-online.git (push)
+heroku	https://git.heroku.com/secret-mountain-14806.git (fetch)
+heroku	https://git.heroku.com/secret-mountain-14806.git (push)
+origin	https://github.com/rrrussrrr/fullstack-online.git (fetch)
+origin	https://github.com/rrrussrrr/fullstack-online.git (push)
