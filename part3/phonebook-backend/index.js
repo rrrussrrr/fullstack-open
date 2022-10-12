@@ -2,6 +2,9 @@ const express = require('express')
 var morgan = require('morgan')
 const app = express()
 app.use(express.json())
+const cors = require('cors')
+app.use(cors())
+app.use(express.static('build'))
 
 morgan.token('data', function (req, res) {
     return JSON.stringify(req.body)
@@ -17,9 +20,7 @@ app.use(morgan(function (tokens, req, res) {
     ].join(' ')
   }))
 
-
-
-
+const Contact = require('./models/contact')
 
 // const requestLogger = (request, response, next) => {
 //     console.log('Method:', request.method)
@@ -31,72 +32,78 @@ app.use(morgan(function (tokens, req, res) {
 
 // app.use(requestLogger)  
 
-let contacts = [
-    { 
-      "id": 1,
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": 2,
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": 3,
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": 4,
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]
+// let contacts = [
+//     { 
+//       "id": 1,
+//       "name": "Arto Hellas", 
+//       "number": "040-123456"
+//     },
+//     { 
+//       "id": 2,
+//       "name": "Ada Lovelace", 
+//       "number": "39-44-5323523"
+//     },
+//     { 
+//       "id": 3,
+//       "name": "Dan Abramov", 
+//       "number": "12-43-234345"
+//     },
+//     { 
+//       "id": 4,
+//       "name": "Mary Poppendieck", 
+//       "number": "39-23-6423122"
+//     }
+// ]
 app.get('/info', (request, response) => {
-    const length = contacts.length;
-    const date = new Date();
-    response.send(
-        `<h1>Phonebook has info for ${length} people</h1>
-         <h2>${date}</h2>`
-    )
+
+    Contact.find({}).countDocuments().then(count => {
+        const date = new Date();
+        response.send(
+            `<h1>Phonebook has info for ${count} people</h1>
+             <h2>${date}</h2>`
+        )
+    }) 
   })
 
 app.get('/', (request, response) => {
-    response.send('<h1>Hello World!</h1>')
-  })
+        response.send('<h1>Hello World!</h1>')
+    })
   
   app.get('/api/contacts', (request, response) => {
-    response.json(contacts)
+    Contact.find({}).then(contacts=> {
+        response.json(contacts)
+    })
   })
 
   app.get('/api/contacts/:id', (request, response) => {
-    const id = Number(request.params.id)
-    console.log(id)
-    const contact = contacts.find(contact => contact.id === id)
-
-    if(!contact) {
-        response.statusMessage = "404 Not Found"
-        response.status(404).end()
-    } else {
-        response.json(contact)
+    const id = request.params.id.trim()
+    if (id.length !== 24) {
+      response.statusMessage = "404 Not Found"
+      return response.status(404).end()     
     }
+    Contact.findById(id).then(contact => {
+      console.log(contact)
+        if(!contact) {
+            response.statusMessage = "404 Not Found"
+            return response.status(404).end()
+        } else {
+            response.json(contact)
+        }
+    })
   })
 
-  app.delete('/api/contacts/:id', (request, response) => {
-    const id = Number(request.params.id)
-    contacts = contacts.filter(contact => contact.id !== id)
-  
-    response.status(204).end()
+
+  app.delete('/api/contacts/:id', (request, response, next) => {
+    Contact.findByIdAndRemove(request.params.id)
+        .then(result => {
+            response.status(204).end()
+        })
   })
 
-  const generateId = () => {
-    const id = Math.floor(Math.random()*999999999)
-    return id
-  }
-
-  app.post('/api/contacts', (request, response) => {
+  app.put('/api/contacts/:id', (request, response) => {
+    const id = request.params.id
     const body = request.body
+    console.log(body)
     if (!body.name) {
         return response.status(400).json({ 
           error: 'name missing' 
@@ -109,22 +116,73 @@ app.get('/', (request, response) => {
         })
       }
 
-      if (contacts.find(contact => contact.name === body.name)) {
-        return response.status(400).json({ 
-          error: 'name must be unique' 
-        })
-      }
-
-      const contact = {
-        id: generateId(),
+    const updatedContact = {
         name: body.name,
         number: body.number,
         date: new Date(),
       } 
 
-    contacts = contacts.concat(contact)
+    Contact.findByIdAndUpdate(id, updatedContact, {new:true})
+      .then(updated => {
+        response.json(updated)
+      })
 
-    response.json(contact)
+    // // contacts = contacts.concat(contact)
+    // contacts = contacts.map(contact => contact.id !== id ? contact : updatedContact)
+    // // contacts = contacts.filter(contact => contact.id !== id).concat(contact)
+    // response.json(updatedContact)
+  })
+
+  const generateId = () => {
+    const id = Math.floor(Math.random()*999999999)
+    return id
+  }
+
+  app.post('/api/contacts', (request, response) => {
+
+    const body = request.body
+    console.log(body)
+    if (!body.name) {
+        return response.status(400).json({ 
+          error: 'name missing' 
+        })
+      }
+
+      if (!body.number) {
+        return response.status(400).json({ 
+          error: 'number missing' 
+        })
+      }
+      
+    // Contact.find({name: body.name}).then(contacts=> {
+    //     if (contacts.count() > 0) {
+    //         return response.status(400).json({ 
+    //           error: 'name must be unique' 
+    //         })
+    //     }
+    // })
+  
+    Contact.find({name: body.name}).countDocuments().then(count => {
+        if (count > 0) {
+            return response.status(400).json({ 
+            error: 'name must be unique' 
+            })           
+        }
+    }) 
+
+    
+        
+
+
+      const contact = new Contact({
+        name: body.name,
+        number: body.number,
+        date: new Date()
+      })
+
+      contact.save().then(savedContact => {
+        response.json(savedContact)
+      })
   })
   
   const unknownEndpoint = (request, response) => {
@@ -133,7 +191,7 @@ app.get('/', (request, response) => {
   
   app.use(unknownEndpoint)
 
-  const PORT = 3002
+  const PORT = process.env.PORT
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
   })
