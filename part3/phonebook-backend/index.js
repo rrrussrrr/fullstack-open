@@ -25,7 +25,9 @@ app.use(morgan(function (tokens, req, res) {
   
     if (error.name === 'CastError') {
       return response.status(400).send({ error: 'malformatted id' })
-    } 
+    } else if (error.name === 'ValidationError') {
+      return response.status(400).json({ error: error.message })
+    }
   
     next(error)
   }
@@ -74,20 +76,9 @@ app.use(morgan(function (tokens, req, res) {
       })
   })
 
-  app.post('/api/contacts', (request, response) => {
+  app.post('/api/contacts', (request, response, next) => {
 
     const body = request.body
-    console.log(body)
-    if (!body.name) {
-        return response.status(400).json({ 
-          error: 'name missing' 
-        })
-      }
-    if (!body.number) {
-      return response.status(400).json({ 
-        error: 'number missing' 
-      })
-    }
 
     Contact.find({name: body.name}).countDocuments().then(count => {
         if (count > 0) {
@@ -106,10 +97,11 @@ app.use(morgan(function (tokens, req, res) {
       contact.save().then(savedContact => {
         response.json(savedContact)
       })
+      .catch(error => next(error))
   })
 
 
-  app.put('/api/contacts/:id', (request, response) => {
+  app.put('/api/contacts/:id', (request, response, next) => {
     const id = request.params.id
     const body = request.body
     console.log(body)
@@ -131,10 +123,15 @@ app.use(morgan(function (tokens, req, res) {
         date: new Date(),
       } 
 
-    Contact.findByIdAndUpdate(id, updatedContact, {new:true})
+    Contact.findByIdAndUpdate(
+      id, 
+      updatedContact, 
+      {new:true, runValidators:true, context: 'query'}
+    )
       .then(updated => {
         response.json(updated)
       })
+      .catch(error => next(error))
   })
 
   app.delete('/api/contacts/:id', (request, response, next) => {
