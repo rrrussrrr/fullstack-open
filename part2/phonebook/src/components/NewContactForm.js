@@ -2,7 +2,9 @@ const NewContactForm = (props) => {
     return (
     <div>
     <h3>Add new contact</h3>  
-      <form onSubmit={props.addContact}>
+      <form onSubmit={
+        props.onSubmit
+        }>
         <div>
           name: <input 
           value={props.newName}
