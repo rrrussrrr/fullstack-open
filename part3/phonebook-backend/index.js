@@ -91,7 +91,7 @@ app.get('/', (request, response) => {
       })
       .catch(error => {
         console.log(error)
-        response.status(500).end()
+        response.status(500).send({error: 'malformatted id'})
       })
   })
 
@@ -193,8 +193,9 @@ app.get('/', (request, response) => {
   }
   
   app.use(unknownEndpoint)
+const apple = 1;
+const PORT = process.env.PORT
 
-  const PORT = process.env.PORT
   app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
   })
