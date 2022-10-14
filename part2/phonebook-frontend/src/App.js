@@ -54,8 +54,9 @@ const App = () => {
       setNewNumber('')
     })
     .catch(error => {
+      console.log(error)
       setErrorMessage(
-        `Information for '${nameObject.name}' was already removed from server`
+        error.data.error
       )
       setTimeout(() => {
         setErrorMessage(null)
@@ -95,11 +96,20 @@ const App = () => {
           setUpdateMessage(null)
         }, 5000)
       })
+      .catch(error => {
+        console.log(error.response.data.error)
+        setErrorMessage(
+          error.response.data.error
+        )
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+        // setContacts(contacts.filter(contact => contact.id !== id))
+      })
     }
   }
 
   const deleteContactByID = id => {
-    const contact = contacts.find(n => n.id === id)
 
     contactService
     .deleteItem(id)
