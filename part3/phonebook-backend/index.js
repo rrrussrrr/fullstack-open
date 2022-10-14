@@ -141,13 +141,6 @@ app.use(morgan(function (tokens, req, res) {
       })
   })
 
-  const generateId = () => {
-    const id = Math.floor(Math.random()*999999999)
-    return id
-  }
-
-
-
   const unknownEndpoint = (request, response) => {
     response.status(404).send({ error: 'unknown endpoint' })
   }
